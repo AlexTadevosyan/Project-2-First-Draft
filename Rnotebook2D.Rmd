@@ -1,0 +1,115 @@
+
+
+_________________________________________________________________________________________________________________
+Scientific Question:
+
+Is increased ACE2 gene expression in lungs of current smokers correlated with an increased risk of SARS-CoV-2 infection in adult current-smokers? 
+
+Scientific Hypothesis:
+
+If current smokers have a higher ACE2 gene expression in lungs compared to nonsmokers, then their rate of SARS-CoV-2 infection per 100,000 compared to nonsmokers will also be higher (p-value<0.05).
+Background:
+
+ACE2 is a transmembrane protein found in epithelial and endothelial cells of the respiratory tract, lungs, kidneys, liver and heart. The SARS-COV-2 virus binds with ACE2 receptors. Smoking tobacco increases the ACE2 gene expression in the respiratory tract and lungs. 
+
+Methods:
+
+I have assumed a constant rate of adult smokers, meaning 13.5% of the population is smokers. And compared this with the prevalence of smoking in adults who tested positive for SARS-COV-2. Null Hypothesis: µ≤13.5
+Alternate Hypothesis: µ>13.5. 
+The data has been collected from a series of published studies as mentioned in the Smoking_Data.xlxs file.
+__________________________________________________________________________________________________________________
+Installing required packages for bio-informatics methods and data science
+1)Tidyverse
+2)ggplot2
+3)ggpubr
+3)Biobase
+4)bio3d
+5)BiocGenerics
+6)BiocManager
+7)BiocParallel
+8)BioConductor
+__________________________________________________________________________________________________________________
+The code below installs the packages
+```{r}
+install.packages("tidyverse")
+install.packages("ggplot2")
+install.packages("ggpubr")
+install.packages("Biobase")
+install.packages("bio3d")
+install.packages("BiocGenerics")
+install.packages("BiocManager")
+install.packages("readxl")
+install.packages("Bioconductor")
+```
+
+__________________________________________________________________________________________________________________
+Part 1: Do Smokers are more at risk for a SARS-COV-2 infection compared to non-smokers
+
+The code below is for reading the excel data file and defining the variable Smoking_Data
+
+```{r}
+library(readxl)
+Smoking_Data <- read_excel ("Smoking Data.xlsx")
+```
+___________________________________________________________________________________________________________________
+The code below is for displaying the first 10 data points to check the data read
+```{r}
+head(Smoking_Data,10)# this displays the first 10 data points from the input file
+```
+___________________________________________________________________________________________________________________
+The code below is to display the summary statistics of the data and plotting the box plot 
+```{r}
+summary(Smoking_Data$`% of smokers`)
+library (ggpubr)
+ggboxplot (Smoking_Data$`% of smokers`,ylab="% of smokers",xlab=FALSE, ggtheme=theme_minimal())# This generates a box plot for the input data
+```
+___________________________________________________________________________________________________________________
+The code below is to draw a quantile-quantile plot of the data and the result shows that for a small sample size. Although the plot deviates slightly from normality plot, the assumption of normal distribution is viable for this data.
+```{r}
+library("ggpubr")
+ggqqplot (Smoking_Data$`% of smokers`,ylab="% of smokers",ggtheme = theme_minimal()) # This generates a q-q plot for analysis of the distribution of the data
+```
+___________________________________________________________________________________________________________________
+Finally, we conduct a one-sample t test for the data with a significance level of 0.05 and
+Null Hypothesis: µ≤13.5
+Alternate Hypothesis: µ>13.5. 
+Since, the pvalue =0.02582, we reject the null hypothesis and conclude that there is sufficient evidence in favor of hypothesis that the average rate of smokers in SARS-COV-2 patients is higher than the average rate of smoking in adult population (13.5%) i.e. smokers are at higher risk of SARS-COV-2 infection that non smokers in adult human population.
+```{r}
+Test <- t.test(Smoking_Data$`% of smokers`, mu = 13.5,alternative="greater")# This conducts the one-sample right sided t-test. 
+Test# This displays the results of the t-test
+```
+_____________________________________________________________________________________________________________________
+Part 2: Single Cell RNA Sequencing (*Unfinished)
+I had made several attempts at this but could not get it to work and could not wrap my head around how to perform this task. I have tried seeking help online and it appears there are a lot of packages available that can perform single-cell rna sequencing. 
+The first problem that I faced was that the data that I have is 2.01 GB fastq file (lung sample 3e) (https://www.ncbi.nlm.nih.gov/bioproject/PRJEB4337/). I used the ShortRead package from Bioconductor to read this fastq file and then also tried reading the fastq file as a fasta file. It takes some time to load but I couldn't get any further than that. I can query the data to see the length and everything but do not understand how to use this file to perform single cell rna sequencing. Below are the packages I tried to perform the single cell rna sequencing and I am still working on this.
+
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("ShortRead")
+library(ShortRead)
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("Biostrings")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("msa")
+library(BiocManager)
+library(Biostrings)
+library(seqinr)
+library(msa)
+
+library(ShortRead)
+Seq_Data <- readFastq("1_130213_AH07R5ADXX_P282_111B_index6_1.fastq/P282_111B_index6_GCCAAT_L001_R1_001.fastq")
+
+#Also tried Seq_Data <- read.fasta("1_130213_AH07R5ADXX_P282_111B_index6_1.fastq/P282_111B_index6_GCCAAT_L001_R1_001.fastq")
+length (Seq_Data)
+
+```
+
+
+
